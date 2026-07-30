@@ -2,6 +2,7 @@ package io.github.oliveiraprojetos.taskmanager.service;
 
 import io.github.oliveiraprojetos.taskmanager.dto.RegisterUserRequest;
 import io.github.oliveiraprojetos.taskmanager.dto.UserResponse;
+import io.github.oliveiraprojetos.taskmanager.exception.UsernameAlreadyExistsException;
 import io.github.oliveiraprojetos.taskmanager.model.User;
 import io.github.oliveiraprojetos.taskmanager.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,10 @@ public class UserService {
     }
 
     public UserResponse register(RegisterUserRequest request) {
+
+        if (userRepository.findByUsername(request.username()).isPresent()) {
+            throw new UsernameAlreadyExistsException();
+        }
 
         User user = new User(
                 request.username(),

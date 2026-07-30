@@ -5,7 +5,6 @@ import io.github.oliveiraprojetos.taskmanager.dto.LoginResponse;
 import io.github.oliveiraprojetos.taskmanager.exception.InvalidCredentialsException;
 import io.github.oliveiraprojetos.taskmanager.model.User;
 import io.github.oliveiraprojetos.taskmanager.repository.UserRepository;
-import io.github.oliveiraprojetos.taskmanager.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

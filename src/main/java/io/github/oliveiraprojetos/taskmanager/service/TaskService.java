@@ -44,8 +44,8 @@ public class TaskService {
                 .orElseThrow(TaskNotFoundException::new);
 
         task.update(
-                request.getTitle(),
-                request.getDescription()
+                request.title(),
+                request.description()
         );
 
         return taskRepository.save(task);

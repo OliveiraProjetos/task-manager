@@ -1,4 +1,4 @@
-package io.github.oliveiraprojetos.taskmanager.security;
+package io.github.oliveiraprojetos.taskmanager.service;
 
 import io.github.oliveiraprojetos.taskmanager.model.User;
 import io.jsonwebtoken.Claims;
