@@ -1,24 +1,19 @@
 package io.github.oliveiraprojetos.taskmanager.controller;
 
-import io.github.oliveiraprojetos.taskmanager.model.Task;
-import io.github.oliveiraprojetos.taskmanager.service.TaskService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import io.github.oliveiraprojetos.taskmanager.dto.CreateTaskRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import io.github.oliveiraprojetos.taskmanager.dto.TaskResponse;
 import io.github.oliveiraprojetos.taskmanager.dto.UpdateTaskRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import io.github.oliveiraprojetos.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
+@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService taskService;
@@ -27,33 +22,63 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping("/tasks")
-    public List<Task> getTasks() {
-        return taskService.getTasks();
+    @GetMapping
+    public List<TaskResponse> getTasks(Authentication authentication) {
+
+        return taskService.getTasks(
+                authentication.getName()
+        );
     }
 
-    @PostMapping("/tasks")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Task createTask(@Valid @RequestBody CreateTaskRequest request) {
-        return taskService.createTask(request);
-    }
-
-    @GetMapping("/tasks/{id}")
-    public Task getTaskById(@PathVariable UUID id) {
-        return taskService.getTaskById(id);
-    }
-
-    @PutMapping("/tasks/{id}")
-    public Task updateTask(
-            @PathVariable UUID id,
-            @RequestBody UpdateTaskRequest request
+    public TaskResponse createTask(
+            @Valid @RequestBody CreateTaskRequest request,
+            Authentication authentication
     ) {
-        return taskService.updateTask(id, request);
+
+        return taskService.createTask(
+                request,
+                authentication.getName()
+        );
     }
 
-    @DeleteMapping("/tasks/{id}")
+    @GetMapping("/{id}")
+    public TaskResponse getTaskById(
+            @PathVariable UUID id,
+            Authentication authentication
+    ) {
+
+        return taskService.getTaskById(
+                id,
+                authentication.getName()
+        );
+    }
+
+    @PutMapping("/{id}")
+    public TaskResponse updateTask(
+            @PathVariable UUID id,
+            @RequestBody UpdateTaskRequest request,
+            Authentication authentication
+    ) {
+
+        return taskService.updateTask(
+                id,
+                request,
+                authentication.getName()
+        );
+    }
+
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTask(@PathVariable UUID id) {
-        taskService.deleteTask(id);
+    public void deleteTask(
+            @PathVariable UUID id,
+            Authentication authentication
+    ) {
+
+        taskService.deleteTask(
+                id,
+                authentication.getName()
+        );
     }
 }

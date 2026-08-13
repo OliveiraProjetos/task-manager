@@ -2,16 +2,16 @@ package io.github.oliveiraprojetos.taskmanager.model;
 
 import io.github.oliveiraprojetos.taskmanager.enums.TaskPriority;
 import io.github.oliveiraprojetos.taskmanager.enums.TaskStatus;
-import java.util.UUID;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tasks")
 public class Task {
+
     @Id
     private UUID id;
 
@@ -23,12 +23,21 @@ public class Task {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     public Task() {
     }
 
-    public Task(String title, String description) {
+    public Task(
+            String title,
+            String description,
+            User user
+    ) {
         this.title = title;
         this.description = description;
+        this.user = user;
 
         this.id = UUID.randomUUID();
         this.status = TaskStatus.PENDING;
@@ -75,6 +84,10 @@ public class Task {
         return updatedAt;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -89,4 +102,3 @@ public class Task {
                 '}';
     }
 }
-

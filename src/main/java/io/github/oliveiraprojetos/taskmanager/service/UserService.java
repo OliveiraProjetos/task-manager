@@ -25,7 +25,7 @@ public class UserService {
     public UserResponse register(RegisterUserRequest request) {
 
         if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new UsernameAlreadyExistsException();
+            throw new UsernameAlreadyExistsException(request.username());
         }
 
         User user = new User(
