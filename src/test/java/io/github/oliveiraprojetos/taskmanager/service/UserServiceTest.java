@@ -51,7 +51,7 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldRegisterUserSuccessfully() {
+    void shouldRegisterUserWhenUsernameDoesNotExist() {
 
         RegisterUserRequest request = registerUserRequest();
 
@@ -90,7 +90,7 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUsernameAlreadyExists() {
+    void shouldThrowUsernameAlreadyExistsExceptionWhenUsernameAlreadyExists() {
 
         RegisterUserRequest request = registerUserRequest();
         User user = existingUser();

@@ -51,7 +51,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldGenerateToken() {
+    void shouldGenerateTokenWhenUserIsValid() {
 
         String token = generateValidToken();
 
@@ -65,7 +65,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldExtractUsernameFromToken() {
+    void shouldExtractUsernameWhenTokenIsValid() {
 
         String token = generateValidToken();
 
@@ -75,7 +75,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldReturnTrueForValidToken() {
+    void shouldReturnTrueWhenTokenIsValid() {
 
         String token = generateValidToken();
 
@@ -83,7 +83,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldReturnFalseForInvalidToken() {
+    void shouldReturnFalseWhenTokenIsInvalid() {
 
         assertFalse(jwtService.isTokenValid("token-invalido"));
     }
@@ -97,7 +97,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenExtractingUsernameFromInvalidToken() {
+    void shouldThrowJwtExceptionWhenTokenIsInvalid() {
 
         assertThrows(
                 JwtException.class,

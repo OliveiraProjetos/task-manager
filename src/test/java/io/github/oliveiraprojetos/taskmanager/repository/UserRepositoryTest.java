@@ -16,7 +16,7 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    void shouldFindUserByUsername() {
+    void shouldFindUserWhenUsernameExists() {
 
         User user = new User(
                 "teste",
