@@ -27,8 +27,14 @@ class TaskResponseTest {
     private static final String TITLE = "Estudar Mockito";
     private static final String DESCRIPTION = "Aprender testes unitários.";
 
+    private static final TaskStatus STATUS =
+            TaskStatus.PENDING;
+
+    private static final TaskPriority PRIORITY =
+            TaskPriority.MEDIUM;
+
     private static final LocalDate DUE_DATE =
-            LocalDate.of(2026, 8, 20);
+            LocalDate.of(2026, 12, 30);
 
     private static final LocalDateTime CREATED_AT =
             LocalDateTime.of(
@@ -58,6 +64,9 @@ class TaskResponseTest {
         Task task = new Task(
                 TITLE,
                 DESCRIPTION,
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 

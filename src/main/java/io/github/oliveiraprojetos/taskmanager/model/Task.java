@@ -15,10 +15,14 @@ public class Task {
     @Id
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private TaskPriority priority;
+
     private String title;
     private String description;
-    private TaskStatus status;
-    private TaskPriority priority;
     private LocalDate dueDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -33,22 +37,39 @@ public class Task {
     public Task(
             String title,
             String description,
+            TaskStatus status,
+            TaskPriority priority,
+            LocalDate dueDate,
             User user
     ) {
         this.title = title;
         this.description = description;
+        this.status = status != null
+                ? status
+                : TaskStatus.PENDING;
+        this.priority = priority != null
+                ? priority
+                : TaskPriority.MEDIUM;
+        this.dueDate = dueDate;
         this.user = user;
 
         this.id = UUID.randomUUID();
-        this.status = TaskStatus.PENDING;
-        this.priority = TaskPriority.MEDIUM;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String title, String description) {
+    public void update(
+            String title,
+            String description,
+            TaskStatus status,
+            TaskPriority priority,
+            LocalDate dueDate
+    ) {
         this.title = title;
         this.description = description;
+        this.status = status;
+        this.priority = priority;
+        this.dueDate = dueDate;
         this.updatedAt = LocalDateTime.now();
     }
 

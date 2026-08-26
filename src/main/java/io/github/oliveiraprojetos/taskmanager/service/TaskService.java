@@ -49,6 +49,9 @@ public class TaskService {
         Task task = new Task(
                 request.title(),
                 request.description(),
+                request.status(),
+                request.priority(),
+                request.dueDate(),
                 user
         );
 
@@ -85,7 +88,10 @@ public class TaskService {
 
         task.update(
                 request.title(),
-                request.description()
+                request.description(),
+                request.status(),
+                request.priority(),
+                request.dueDate()
         );
 
         Task updatedTask = taskRepository.save(task);

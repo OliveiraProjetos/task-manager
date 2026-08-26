@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -56,24 +57,51 @@ class TaskServiceTest {
     private static final String TITLE = "Estudar Mockito";
     private static final String DESCRIPTION = "Aprender verify()";
 
+    private static final TaskStatus STATUS =
+            TaskStatus.PENDING;
+
+    private static final TaskPriority PRIORITY =
+            TaskPriority.MEDIUM;
+
+    private static final LocalDate DUE_DATE =
+            LocalDate.of(2026, 12, 30);
+
     private static final String EXISTING_TITLE = "Título antigo";
     private static final String EXISTING_DESCRIPTION = "Descrição antiga";
 
     private static final String UPDATED_TITLE = "Título novo";
     private static final String UPDATED_DESCRIPTION = "Descrição nova";
 
+    private static final TaskStatus UPDATED_STATUS =
+            TaskStatus.COMPLETED;
+
+    private static final TaskPriority UPDATED_PRIORITY =
+            TaskPriority.HIGH;
+
+    private static final LocalDate UPDATED_DUE_DATE =
+            LocalDate.of(2026, 12, 31);
+
     private User user() {
         return mock(User.class);
     }
 
     private CreateTaskRequest createTaskRequest() {
-        return new CreateTaskRequest(TITLE, DESCRIPTION);
+        return new CreateTaskRequest(
+                TITLE,
+                DESCRIPTION,
+                STATUS,
+                PRIORITY,
+                DUE_DATE
+        );
     }
 
     private UpdateTaskRequest updateTaskRequest() {
         return new UpdateTaskRequest(
                 UPDATED_TITLE,
-                UPDATED_DESCRIPTION
+                UPDATED_DESCRIPTION,
+                UPDATED_STATUS,
+                UPDATED_PRIORITY,
+                UPDATED_DUE_DATE
         );
     }
 
@@ -90,6 +118,9 @@ class TaskServiceTest {
         Task task = new Task(
                 TITLE,
                 DESCRIPTION,
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 
@@ -105,6 +136,9 @@ class TaskServiceTest {
 
         assertEquals(TITLE, result.title());
         assertEquals(DESCRIPTION, result.description());
+        assertEquals(STATUS, result.status());
+        assertEquals(PRIORITY, result.priority());
+        assertEquals(DUE_DATE, result.dueDate());
 
         verify(userRepository)
                 .findByUsername(USERNAME);
@@ -164,8 +198,9 @@ class TaskServiceTest {
         assertEquals(TITLE, result.title());
         assertEquals(DESCRIPTION, result.description());
 
-        assertEquals(TaskStatus.PENDING, result.status());
-        assertEquals(TaskPriority.MEDIUM, result.priority());
+        assertEquals(STATUS, result.status());
+        assertEquals(PRIORITY, result.priority());
+        assertEquals(DUE_DATE, result.dueDate());
 
         assertNotNull(result.createdAt());
         assertNotNull(result.updatedAt());
@@ -183,6 +218,9 @@ class TaskServiceTest {
         assertEquals(TITLE, savedTask.getTitle());
         assertEquals(DESCRIPTION, savedTask.getDescription());
         assertEquals(user, savedTask.getUser());
+        assertEquals(STATUS, savedTask.getStatus());
+        assertEquals(PRIORITY, savedTask.getPriority());
+        assertEquals(DUE_DATE, savedTask.getDueDate());
     }
 
     @Test
@@ -198,12 +236,18 @@ class TaskServiceTest {
         Task task1 = new Task(
                 "Task 1",
                 "Descrição 1",
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 
         Task task2 = new Task(
                 "Task 2",
                 "Descrição 2",
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 
@@ -219,12 +263,27 @@ class TaskServiceTest {
 
         assertEquals(
                 "Task 1",
-                result.get(0).title()
+                result.getFirst().title()
         );
 
         assertEquals(
                 "Descrição 1",
-                result.get(0).description()
+                result.getFirst().description()
+        );
+
+        assertEquals(
+                STATUS,
+                result.getFirst().status()
+        );
+
+        assertEquals(
+                PRIORITY,
+                result.get(0).priority()
+        );
+
+        assertEquals(
+                DUE_DATE,
+                result.get(0).dueDate()
         );
 
         assertEquals(
@@ -235,6 +294,21 @@ class TaskServiceTest {
         assertEquals(
                 "Descrição 2",
                 result.get(1).description()
+        );
+
+        assertEquals(
+                STATUS,
+                result.get(1).status()
+        );
+
+        assertEquals(
+                PRIORITY,
+                result.get(1).priority()
+        );
+
+        assertEquals(
+                DUE_DATE,
+                result.get(1).dueDate()
         );
 
         verify(userRepository)
@@ -257,6 +331,9 @@ class TaskServiceTest {
         Task task = new Task(
                 EXISTING_TITLE,
                 EXISTING_DESCRIPTION,
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 
@@ -276,9 +353,15 @@ class TaskServiceTest {
 
         assertEquals(UPDATED_TITLE, result.title());
         assertEquals(UPDATED_DESCRIPTION, result.description());
+        assertEquals(UPDATED_STATUS, result.status());
+        assertEquals(UPDATED_PRIORITY, result.priority());
+        assertEquals(UPDATED_DUE_DATE, result.dueDate());
 
         assertEquals(UPDATED_TITLE, task.getTitle());
         assertEquals(UPDATED_DESCRIPTION, task.getDescription());
+        assertEquals(UPDATED_STATUS, task.getStatus());
+        assertEquals(UPDATED_PRIORITY, task.getPriority());
+        assertEquals(UPDATED_DUE_DATE, task.getDueDate());
 
         assertTrue(
                 task.getUpdatedAt().isAfter(oldUpdatedAt)
@@ -339,6 +422,9 @@ class TaskServiceTest {
         Task task = new Task(
                 TITLE,
                 DESCRIPTION,
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 

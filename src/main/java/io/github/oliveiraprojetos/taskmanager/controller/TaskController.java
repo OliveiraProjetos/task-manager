@@ -58,7 +58,7 @@ public class TaskController {
     @PutMapping("/{id}")
     public TaskResponse updateTask(
             @PathVariable UUID id,
-            @RequestBody UpdateTaskRequest request,
+            @Valid @RequestBody UpdateTaskRequest request,
             Authentication authentication
     ) {
 

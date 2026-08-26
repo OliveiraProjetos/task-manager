@@ -1,7 +1,11 @@
 package io.github.oliveiraprojetos.taskmanager.dto;
 
+import io.github.oliveiraprojetos.taskmanager.enums.TaskPriority;
+import io.github.oliveiraprojetos.taskmanager.enums.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 
 public record CreateTaskRequest(
 
@@ -10,7 +14,12 @@ public record CreateTaskRequest(
         String title,
 
         @Size(max = 500, message = "Description must have at most 500 characters.")
-        String description
+        String description,
 
+        TaskStatus status,
+
+        TaskPriority priority,
+
+        LocalDate dueDate
 ) {
 }

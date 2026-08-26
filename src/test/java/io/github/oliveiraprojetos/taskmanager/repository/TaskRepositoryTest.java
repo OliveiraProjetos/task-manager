@@ -1,11 +1,14 @@
 package io.github.oliveiraprojetos.taskmanager.repository;
 
+import io.github.oliveiraprojetos.taskmanager.enums.TaskPriority;
+import io.github.oliveiraprojetos.taskmanager.enums.TaskStatus;
 import io.github.oliveiraprojetos.taskmanager.model.Task;
 import io.github.oliveiraprojetos.taskmanager.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class TaskRepositoryTest {
+
+    private static final TaskStatus STATUS =
+            TaskStatus.PENDING;
+
+    private static final TaskPriority PRIORITY =
+            TaskPriority.MEDIUM;
+
+    private static final LocalDate DUE_DATE =
+            LocalDate.of(2026, 12, 30);
 
     @Autowired
     private TaskRepository taskRepository;
@@ -30,12 +42,18 @@ class TaskRepositoryTest {
         Task task1 = new Task(
                 "Task 1",
                 "Descrição 1",
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 
         Task task2 = new Task(
                 "Task 2",
                 "Descrição 2",
+                STATUS,
+                PRIORITY,
+                DUE_DATE,
                 user
         );
 
@@ -71,6 +89,9 @@ class TaskRepositoryTest {
                 new Task(
                         "Estudar Java",
                         "Estudar testes",
+                        STATUS,
+                        PRIORITY,
+                        DUE_DATE,
                         user
                 )
         );
@@ -103,6 +124,9 @@ class TaskRepositoryTest {
                 new Task(
                         "Task privada",
                         "Descrição",
+                        STATUS,
+                        PRIORITY,
+                        DUE_DATE,
                         user1
                 )
         );

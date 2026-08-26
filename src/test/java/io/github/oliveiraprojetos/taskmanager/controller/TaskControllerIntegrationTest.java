@@ -3,6 +3,8 @@ package io.github.oliveiraprojetos.taskmanager.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.oliveiraprojetos.taskmanager.dto.CreateTaskRequest;
 import io.github.oliveiraprojetos.taskmanager.dto.UpdateTaskRequest;
+import io.github.oliveiraprojetos.taskmanager.enums.TaskPriority;
+import io.github.oliveiraprojetos.taskmanager.enums.TaskStatus;
 import io.github.oliveiraprojetos.taskmanager.model.Task;
 import io.github.oliveiraprojetos.taskmanager.model.User;
 import io.github.oliveiraprojetos.taskmanager.repository.TaskRepository;
@@ -22,12 +24,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,9 +53,27 @@ class TaskControllerIntegrationTest {
     private static final String TASK_DESCRIPTION =
             "Estudar testes de integração";
 
+    private static final TaskStatus TASK_STATUS =
+            TaskStatus.PENDING;
+
+    private static final TaskPriority TASK_PRIORITY =
+            TaskPriority.MEDIUM;
+
+    private static final LocalDate TASK_DUE_DATE =
+            LocalDate.of(2026, 12, 30);
+
     private static final String UPDATED_TITLE = "Título atualizado";
     private static final String UPDATED_DESCRIPTION =
             "Descrição atualizada";
+
+    private static final TaskStatus UPDATED_STATUS =
+            TaskStatus.COMPLETED;
+
+    private static final TaskPriority UPDATED_PRIORITY =
+            TaskPriority.HIGH;
+
+    private static final LocalDate UPDATED_DUE_DATE =
+            LocalDate.of(2026, 12, 31);
 
     @Autowired
     private MockMvc mockMvc;
@@ -103,7 +125,13 @@ class TaskControllerIntegrationTest {
                     .andExpect(jsonPath("$[0].title")
                             .value(TASK_TITLE))
                     .andExpect(jsonPath("$[0].description")
-                            .value(TASK_DESCRIPTION));
+                            .value(TASK_DESCRIPTION))
+                    .andExpect(jsonPath("$[0].status")
+                            .value(TASK_STATUS.name()))
+                    .andExpect(jsonPath("$[0].priority")
+                            .value(TASK_PRIORITY.name()))
+                    .andExpect(jsonPath("$[0].dueDate")
+                            .value(TASK_DUE_DATE.toString()));
         }
 
         @Test
@@ -244,7 +272,10 @@ class TaskControllerIntegrationTest {
 
             CreateTaskRequest request = new CreateTaskRequest(
                     TASK_TITLE,
-                    TASK_DESCRIPTION
+                    TASK_DESCRIPTION,
+                    TASK_STATUS,
+                    TASK_PRIORITY,
+                    TASK_DUE_DATE
             );
 
             mockMvc.perform(
@@ -263,9 +294,11 @@ class TaskControllerIntegrationTest {
                     .andExpect(jsonPath("$.description")
                             .value(TASK_DESCRIPTION))
                     .andExpect(jsonPath("$.status")
-                            .value("PENDING"))
+                            .value(TASK_STATUS.name()))
                     .andExpect(jsonPath("$.priority")
-                            .value("MEDIUM"));
+                            .value(TASK_PRIORITY.name()))
+                    .andExpect(jsonPath("$.dueDate")
+                            .value(TASK_DUE_DATE.toString()));
 
             assertEquals(1, taskRepository.count());
 
@@ -276,9 +309,70 @@ class TaskControllerIntegrationTest {
             assertEquals(TASK_DESCRIPTION, savedTask.getDescription());
 
             assertEquals(
+                    TASK_STATUS,
+                    savedTask.getStatus()
+            );
+
+            assertEquals(
+                    TASK_PRIORITY,
+                    savedTask.getPriority()
+            );
+
+            assertEquals(
+                    TASK_DUE_DATE,
+                    savedTask.getDueDate()
+            );
+
+            assertEquals(
                     user.getId(),
                     savedTask.getUser().getId()
             );
+        }
+
+        @Test
+        void shouldUseDefaultStatusAndPriorityWhenTheyAreNull() throws Exception {
+
+            User user = saveUser();
+            String token = generateToken(user);
+
+            CreateTaskRequest request = new CreateTaskRequest(
+                    TASK_TITLE,
+                    TASK_DESCRIPTION,
+                    null,
+                    null,
+                    null
+            );
+
+            mockMvc.perform(
+                            post(TASKS_URL)
+                                    .header(
+                                            HttpHeaders.AUTHORIZATION,
+                                            bearerToken(token)
+                                    )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(request))
+                    )
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.status")
+                            .value("PENDING"))
+                    .andExpect(jsonPath("$.priority")
+                            .value("MEDIUM"))
+                    .andExpect(jsonPath("$.dueDate")
+                            .doesNotExist());
+
+            Task savedTask = taskRepository.findAll().getFirst();
+
+            assertEquals(
+                    TaskStatus.PENDING,
+                    savedTask.getStatus()
+            );
+
+            assertEquals(
+                    TaskPriority.MEDIUM,
+                    savedTask.getPriority()
+            );
+
+            assertNull(savedTask.getDueDate());
         }
 
         @Test
@@ -286,7 +380,10 @@ class TaskControllerIntegrationTest {
 
             CreateTaskRequest request = new CreateTaskRequest(
                     TASK_TITLE,
-                    TASK_DESCRIPTION
+                    TASK_DESCRIPTION,
+                    TASK_STATUS,
+                    TASK_PRIORITY,
+                    TASK_DUE_DATE
             );
 
             mockMvc.perform(
@@ -307,7 +404,10 @@ class TaskControllerIntegrationTest {
 
             CreateTaskRequest request = new CreateTaskRequest(
                     "",
-                    TASK_DESCRIPTION
+                    TASK_DESCRIPTION,
+                    TASK_STATUS,
+                    TASK_PRIORITY,
+                    TASK_DUE_DATE
             );
 
             mockMvc.perform(
@@ -334,7 +434,10 @@ class TaskControllerIntegrationTest {
 
             CreateTaskRequest request = new CreateTaskRequest(
                     title,
-                    TASK_DESCRIPTION
+                    TASK_DESCRIPTION,
+                    TASK_STATUS,
+                    TASK_PRIORITY,
+                    TASK_DUE_DATE
             );
 
             mockMvc.perform(
@@ -359,7 +462,10 @@ class TaskControllerIntegrationTest {
 
             CreateTaskRequest request = new CreateTaskRequest(
                     TASK_TITLE,
-                    null
+                    null,
+                    TASK_STATUS,
+                    TASK_PRIORITY,
+                    TASK_DUE_DATE
             );
 
             mockMvc.perform(
@@ -375,7 +481,13 @@ class TaskControllerIntegrationTest {
                     .andExpect(jsonPath("$.title")
                             .value(TASK_TITLE))
                     .andExpect(jsonPath("$.description")
-                            .doesNotExist());
+                            .doesNotExist())
+                    .andExpect(jsonPath("$.status")
+                    .value(TASK_STATUS.name()))
+                    .andExpect(jsonPath("$.priority")
+                            .value(TASK_PRIORITY.name()))
+                    .andExpect(jsonPath("$.dueDate")
+                            .value(TASK_DUE_DATE.toString()));
 
             assertEquals(1, taskRepository.count());
         }
@@ -405,7 +517,13 @@ class TaskControllerIntegrationTest {
                     .andExpect(jsonPath("$.title")
                             .value(TASK_TITLE))
                     .andExpect(jsonPath("$.description")
-                            .value(TASK_DESCRIPTION));
+                            .value(TASK_DESCRIPTION))
+                    .andExpect(jsonPath("$.status")
+                            .value(TASK_STATUS.name()))
+                    .andExpect(jsonPath("$.priority")
+                            .value(TASK_PRIORITY.name()))
+                    .andExpect(jsonPath("$.dueDate")
+                            .value(TASK_DUE_DATE.toString()));
         }
 
         @Test
@@ -473,7 +591,10 @@ class TaskControllerIntegrationTest {
 
             UpdateTaskRequest request = new UpdateTaskRequest(
                     UPDATED_TITLE,
-                    UPDATED_DESCRIPTION
+                    UPDATED_DESCRIPTION,
+                    UPDATED_STATUS,
+                    UPDATED_PRIORITY,
+                    UPDATED_DUE_DATE
             );
 
             mockMvc.perform(
@@ -491,7 +612,13 @@ class TaskControllerIntegrationTest {
                     .andExpect(jsonPath("$.title")
                             .value(UPDATED_TITLE))
                     .andExpect(jsonPath("$.description")
-                            .value(UPDATED_DESCRIPTION));
+                            .value(UPDATED_DESCRIPTION))
+                    .andExpect(jsonPath("$.status")
+                            .value(UPDATED_STATUS.name()))
+                    .andExpect(jsonPath("$.priority")
+                            .value(UPDATED_PRIORITY.name()))
+                    .andExpect(jsonPath("$.dueDate")
+                            .value(UPDATED_DUE_DATE.toString()));
 
             Task updatedTask = taskRepository
                     .findById(savedTask.getId())
@@ -501,6 +628,21 @@ class TaskControllerIntegrationTest {
             assertEquals(
                     UPDATED_DESCRIPTION,
                     updatedTask.getDescription()
+            );
+
+            assertEquals(
+                    UPDATED_STATUS,
+                    updatedTask.getStatus()
+            );
+
+            assertEquals(
+                    UPDATED_PRIORITY,
+                    updatedTask.getPriority()
+            );
+
+            assertEquals(
+                    UPDATED_DUE_DATE,
+                    updatedTask.getDueDate()
             );
         }
 
@@ -513,7 +655,10 @@ class TaskControllerIntegrationTest {
 
             UpdateTaskRequest request = new UpdateTaskRequest(
                     UPDATED_TITLE,
-                    UPDATED_DESCRIPTION
+                    UPDATED_DESCRIPTION,
+                    UPDATED_STATUS,
+                    UPDATED_PRIORITY,
+                    UPDATED_DUE_DATE
             );
 
             mockMvc.perform(
@@ -548,7 +693,10 @@ class TaskControllerIntegrationTest {
 
             UpdateTaskRequest request = new UpdateTaskRequest(
                     UPDATED_TITLE,
-                    UPDATED_DESCRIPTION
+                    UPDATED_DESCRIPTION,
+                    UPDATED_STATUS,
+                    UPDATED_PRIORITY,
+                    UPDATED_DUE_DATE
             );
 
             mockMvc.perform(
@@ -577,7 +725,10 @@ class TaskControllerIntegrationTest {
 
             UpdateTaskRequest request = new UpdateTaskRequest(
                     "Título alterado",
-                    "Descrição alterada"
+                    "Descrição alterada",
+                    UPDATED_STATUS,
+                    UPDATED_PRIORITY,
+                    UPDATED_DUE_DATE
             );
 
             mockMvc.perform(
@@ -720,6 +871,9 @@ class TaskControllerIntegrationTest {
         Task task = new Task(
                 TASK_TITLE,
                 TASK_DESCRIPTION,
+                TASK_STATUS,
+                TASK_PRIORITY,
+                TASK_DUE_DATE,
                 user
         );
 
