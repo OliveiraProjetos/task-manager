@@ -268,7 +268,7 @@ class GlobalExceptionHandlerTest {
         );
 
         assertEquals(
-                "Erro interno do servidor.",
+                "Internal Server Error.",
                 error.message()
         );
 

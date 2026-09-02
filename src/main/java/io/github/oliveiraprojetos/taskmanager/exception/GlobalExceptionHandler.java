@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     ) {
         return buildError(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal server error.",
+                "Internal Server Error.",
                 request
         );
     }
