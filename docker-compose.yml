@@ -1,0 +1,28 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: taskmanager-postgres
+    environment:
+      POSTGRES_DB: taskmanager
+      POSTGRES_USER: taskmanager
+      POSTGRES_PASSWORD: taskmanager123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: taskmanager-app
+    depends_on:
+      - postgres
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/taskmanager
+      DB_USERNAME: taskmanager
+      DB_PASSWORD: taskmanager123
+      JWT_SECRET: REMOVED_SECRET
+      JWT_EXPIRATION: 3600000
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
