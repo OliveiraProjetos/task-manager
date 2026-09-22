@@ -264,3 +264,7 @@
   color: #2563eb;
   font-weight: 600;
 }
+
+.task-actions a {
+  text-decoration: none;
+}

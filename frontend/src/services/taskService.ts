@@ -1,11 +1,36 @@
-import { apiRequest } from "./apiClient";
-import type { CreateTaskRequest, Task } from "../types/Task";
+import { ApiError, apiRequest } from "./apiClient";
+import type {
+    CreateTaskRequest,
+    Task,
+    UpdateTaskRequest,
+} from "../types/Task";
+
+async function getErrorMessage(response: Response): Promise<string> {
+    try {
+        const data = await response.json();
+
+        if (typeof data.message === "string") {
+            return data.message;
+        }
+
+        if (typeof data.error === "string") {
+            return data.error;
+        }
+    } catch {
+        // Ignore invalid or empty response bodies.
+    }
+
+    return "Request failed";
+}
 
 export async function getTasks(token: string): Promise<Task[]> {
     const response = await apiRequest("/tasks", {}, token);
 
     if (!response.ok) {
-        throw new Error("Failed to fetch tasks");
+        throw new ApiError(
+            response.status,
+            await getErrorMessage(response)
+        );
     }
 
     return response.json();
@@ -25,7 +50,10 @@ export async function createTask(
     );
 
     if (!response.ok) {
-        throw new Error("Failed to create task");
+        throw new ApiError(
+            response.status,
+            await getErrorMessage(response)
+        );
     }
 
     return response.json();
@@ -33,7 +61,7 @@ export async function createTask(
 
 export async function updateTask(
     id: string,
-    task: CreateTaskRequest,
+    task: UpdateTaskRequest,
     token: string
 ): Promise<Task> {
     const response = await apiRequest(
@@ -46,7 +74,10 @@ export async function updateTask(
     );
 
     if (!response.ok) {
-        throw new Error("Failed to update task");
+        throw new ApiError(
+            response.status,
+            await getErrorMessage(response)
+        );
     }
 
     return response.json();
@@ -65,7 +96,10 @@ export async function deleteTask(
     );
 
     if (!response.ok) {
-        throw new Error("Failed to delete task");
+        throw new ApiError(
+            response.status,
+            await getErrorMessage(response)
+        );
     }
 }
 
@@ -79,12 +113,11 @@ export async function getTask(
         token
     );
 
-    if (response.status === 404) {
-        throw new Error("TASK_NOT_FOUND");
-    }
-
     if (!response.ok) {
-        throw new Error("Failed to fetch task");
+        throw new ApiError(
+            response.status,
+            await getErrorMessage(response)
+        );
     }
 
     return response.json();

@@ -1,5 +1,15 @@
 const API_URL = "http://localhost:8080";
 
+export class ApiError extends Error {
+    status: number;
+
+    constructor(status: number, message: string) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+    }
+}
+
 export async function apiRequest(
     path: string,
     options: RequestInit = {},
@@ -21,7 +31,7 @@ export async function apiRequest(
     });
 
     if (response.status === 401) {
-        throw new Error("UNAUTHORIZED");
+        throw new ApiError(401, "UNAUTHORIZED");
     }
 
     return response;

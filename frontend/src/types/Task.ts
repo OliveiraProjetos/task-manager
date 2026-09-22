@@ -12,3 +12,11 @@ export type CreateTaskRequest = {
     description: string;
     dueDate: string;
 };
+
+export type UpdateTaskRequest = {
+    title: string;
+    description: string;
+    status: Task["status"];
+    priority: Task["priority"];
+    dueDate: string;
+};

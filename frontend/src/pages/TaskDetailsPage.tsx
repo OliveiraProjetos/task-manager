@@ -1,38 +1,38 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+
+import Header from "../components/Header";
+import TaskEditForm from "../components/TaskEditForm";
 import { useAuth } from "../contexts/AuthContext";
-import { getTask } from "../services/taskService";
-import type { Task } from "../types/Task";
+import { getTask, updateTask } from "../services/taskService";
+import { isUnauthorizedError } from "../utils/apiError";
+import type { Task, UpdateTaskRequest } from "../types/Task";
 
 function TaskDetailsPage() {
     const { id } = useParams<{ id: string }>();
+    const { token, logout } = useAuth();
 
     const [task, setTask] = useState<Task | null>(null);
     const [loading, setLoading] = useState(true);
+    const [editing, setEditing] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { token, logout } = useAuth();
 
     useEffect(() => {
-        if (!id) {
-            setError("Task not found");
-            setLoading(false);
-            return;
-        }
-
-        const taskId = id;
-
         async function loadTask() {
-            try {
-                setLoading(true);
-                setError(null);
+            if (!id) {
+                setError("Task not found");
+                setLoading(false);
+                return;
+            }
 
-                const data = await getTask(taskId, token!);
+            setLoading(true);
+            setError(null);
+
+            try {
+                const data = await getTask(id, token!);
                 setTask(data);
             } catch (error) {
-                if (
-                    error instanceof Error &&
-                    error.message === "UNAUTHORIZED"
-                ) {
+                if (isUnauthorizedError(error)) {
                     logout();
                     return;
                 }
@@ -52,44 +52,117 @@ function TaskDetailsPage() {
         }
 
         void loadTask();
-    }, [id, token, logout]);
+    }, [id, token]);
 
-    if (loading) {
-        return <p>Loading task...</p>;
+    async function handleUpdateTask(data: UpdateTaskRequest) {
+        if (!task) {
+            return;
+        }
+
+        try {
+            const updatedTask = await updateTask(
+                task.id,
+                data,
+                token!
+            );
+
+            setTask(updatedTask);
+            setEditing(false);
+            setError(null);
+        } catch (error) {
+            if (isUnauthorizedError(error)) {
+                logout();
+                return;
+            }
+
+            throw error;
+        }
     }
 
-    if (error) {
-        return (
-            <main>
-                <p>{error}</p>
-                <Link to="/tasks">Back to tasks</Link>
-            </main>
-        );
-    }
-
-    if (!task) {
-        return null;
+    function handleCancelEdit() {
+        setEditing(false);
+        setError(null);
     }
 
     return (
-        <>
-            <header>
-                <h1>Task details</h1>
-                <button onClick={logout}>Logout</button>
-            </header>
+        <div className="app">
+            <main className="page-container">
+                <Header
+                    title="Task details"
+                    subtitle="View your task information"
+                />
 
-            <main>
-                <h2>{task.title}</h2>
+                <div className="button-group">
+                    <Link
+                        className="secondary-button"
+                        to="/tasks"
+                    >
+                        Back to tasks
+                    </Link>
+                </div>
 
-                <p>{task.description}</p>
+                <section className="content-section">
+                    {loading ? (
+                        <div className="empty-state">
+                            <p>Loading task...</p>
+                        </div>
+                    ) : error && !task ? (
+                        <div className="error-state">
+                            <p>{error}</p>
+                        </div>
+                    ) : task ? (
+                        editing ? (
+                            <article className="task-card">
+                                <TaskEditForm
+                                    task={task}
+                                    onSave={async (data) => {
+                                        await handleUpdateTask({
+                                            ...data,
+                                            status: task.status,
+                                            priority: task.priority,
+                                        });
+                                    }}
+                                    onCancel={handleCancelEdit}
+                                />
+                            </article>
+                        ) : (
+                            <article className="task-card">
+                                <h2>{task.title}</h2>
 
-                <p>Status: {task.status}</p>
-                <p>Priority: {task.priority}</p>
-                <p>Due date: {task.dueDate}</p>
+                                <p>{task.description}</p>
 
-                <Link to="/tasks">Back to tasks</Link>
+                                <div className="task-meta">
+                                    <span
+                                        className={`badge status-${task.status.toLowerCase()}`}
+                                    >
+                                        Status: {task.status}
+                                    </span>
+
+                                    <span
+                                        className={`badge priority-${task.priority.toLowerCase()}`}
+                                    >
+                                        Priority: {task.priority}
+                                    </span>
+
+                                    <span className="badge">
+                                        Due: {task.dueDate}
+                                    </span>
+                                </div>
+
+                                <div className="task-actions">
+                                    <button
+                                        className="secondary-button"
+                                        onClick={() => setEditing(true)}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            </article>
+                        )
+                    ) : null}
+                </section>
             </main>
-        </>
+        </div>
     );
 }
 

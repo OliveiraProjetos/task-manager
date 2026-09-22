@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useAuth } from "../contexts/AuthContext";
 import type { Task } from "../types/Task";
 import { createTask } from "../services/taskService";
-import {
-    taskSchema,
-    type TaskFormData,
-} from "../schemas/taskSchema";
+import {taskSchema, type TaskFormData,} from "../schemas/taskSchema";
+import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
 
 type TaskFormProps = {
     token: string;
@@ -15,8 +14,8 @@ type TaskFormProps = {
 };
 
 function TaskForm({ token, onTaskCreated }: TaskFormProps) {
+    const { logout } = useAuth();
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
 
     const {
         register,
@@ -37,27 +36,18 @@ function TaskForm({ token, onTaskCreated }: TaskFormProps) {
 
     async function onSubmit(data: TaskFormData) {
         setError(null);
-        setSuccess(false);
 
         try {
-            const createdTask = await createTask(
-                data,
-                token
-            );
-
+            const createdTask = await createTask(data, token);
             onTaskCreated(createdTask);
             reset();
-            setSuccess(true);
         } catch (error) {
-            if (
-                error instanceof Error &&
-                error.message === "UNAUTHORIZED"
-            ) {
-                setError("Your session has expired");
+            if (isUnauthorizedError(error)) {
+                logout();
                 return;
             }
 
-            setError("Failed to create task");
+            setError(getUserErrorMessage(error));
         }
     }
 
@@ -121,12 +111,6 @@ function TaskForm({ token, onTaskCreated }: TaskFormProps) {
             </div>
 
             {error && <p className="form-error">{error}</p>}
-
-            {success && (
-                <p className="form-success">
-                    Task created successfully.
-                </p>
-            )}
 
             <button
                 className="primary-button"

@@ -1,12 +1,11 @@
 import TaskCard from "./TaskCard";
-import type { Task } from "../types/Task";
-import type {TaskFormData} from "../schemas/taskSchema.ts";
+import type { Task, UpdateTaskRequest } from "../types/Task";
 
 type TaskListProps = {
     tasks: Task[];
     onUpdate: (
         id: string,
-        data: TaskFormData
+        data: UpdateTaskRequest
     ) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
 };

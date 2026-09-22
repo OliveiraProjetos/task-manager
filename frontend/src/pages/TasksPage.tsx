@@ -4,12 +4,14 @@ import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 import { useAuth } from "../contexts/AuthContext";
 import {deleteTask, getTasks, updateTask } from "../services/taskService";
-import type { Task } from "../types/Task";
+import type { Task, UpdateTaskRequest } from "../types/Task";
+import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
 
 function TasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const { token, logout } = useAuth();
 
     useEffect(() => {
@@ -22,12 +24,12 @@ function TasksPage() {
                 const data = await getTasks(token!);
                 setTasks(data);
             } catch (error) {
-                if (error instanceof Error && error.message === "UNAUTHORIZED") {
+                if (isUnauthorizedError(error)) {
                     logout();
                     return;
                 }
 
-                setError("Failed to load tasks");
+                setError(getUserErrorMessage(error));
             } finally {
                 setLoading(false);
             }
@@ -38,36 +40,33 @@ function TasksPage() {
 
     function handleTaskCreated(task: Task) {
         setTasks(currentTasks => [...currentTasks, task]);
+        setSuccessMessage("Task created successfully.");
     }
 
     async function handleDeleteTask(id: string) {
+        setSuccessMessage(null);
+
         try {
             await deleteTask(id, token!);
 
             setTasks(currentTasks =>
                 currentTasks.filter(task => task.id !== id)
             );
+
+            setSuccessMessage("Task deleted successfully.");
         } catch (error) {
-            if (
-                error instanceof Error &&
-                error.message === "UNAUTHORIZED"
-            ) {
+            if (isUnauthorizedError(error)) {
                 logout();
                 return;
             }
 
-            throw error;
+            setError(getUserErrorMessage(error));
         }
     }
 
-    async function handleUpdateTask(
-        id: string,
-        data: {
-            title: string;
-            description: string;
-            dueDate: string;
-        }
-    ) {
+    async function handleUpdateTask(id: string, data: UpdateTaskRequest) {
+        setSuccessMessage(null);
+
         try {
             const updatedTask = await updateTask(
                 id,
@@ -80,16 +79,15 @@ function TasksPage() {
                     task.id === id ? updatedTask : task
                 )
             );
+
+            setSuccessMessage("Task updated successfully.");
         } catch (error) {
-            if (
-                error instanceof Error &&
-                error.message === "UNAUTHORIZED"
-            ) {
+            if (isUnauthorizedError(error)) {
                 logout();
                 return;
             }
 
-            throw error;
+            setError(getUserErrorMessage(error));
         }
     }
 
@@ -109,6 +107,12 @@ function TasksPage() {
                         Logout
                     </button>
                 </div>
+
+                {successMessage && (
+                    <p className="form-success">
+                        {successMessage}
+                    </p>
+                )}
 
                 <section className="content-section">
                     <TaskForm
