@@ -163,11 +163,18 @@ function TasksPage() {
                                 </select>
                             </div>
 
-                            <TaskList
-                                tasks={filteredTasks}
-                                onUpdate={handleUpdateTask}
-                                onDelete={handleDeleteTask}
-                            />
+                            {filteredTasks.length === 0 ? (
+                                <div className="empty-state">
+                                    <h3>No tasks match this filter</h3>
+                                    <p>Try selecting a different status.</p>
+                                </div>
+                            ) : (
+                                <TaskList
+                                    tasks={filteredTasks}
+                                    onUpdate={handleUpdateTask}
+                                    onDelete={handleDeleteTask}
+                                />
+                            )}
                         </>
                     )}
                 </section>
