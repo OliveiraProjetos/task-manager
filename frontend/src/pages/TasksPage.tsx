@@ -9,15 +9,21 @@ import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
 
 function TasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [selectedPriority, setSelectedPriority] = useState<Task["priority"] | "ALL">("ALL");
     const [selectedStatus, setSelectedStatus] = useState<Task["status"] | "ALL">("ALL");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const { token, logout } = useAuth();
-    const filteredTasks =
-        selectedStatus === "ALL"
-            ? tasks
-            : tasks.filter(task => task.status === selectedStatus);
+    const filteredTasks = tasks.filter(task => {
+        const matchesStatus =
+            selectedStatus === "ALL" || task.status === selectedStatus;
+
+        const matchesPriority =
+            selectedPriority === "ALL" || task.priority === selectedPriority;
+
+        return matchesStatus && matchesPriority;
+    });
 
     useEffect(() => {
 
@@ -160,6 +166,27 @@ function TasksPage() {
                                     <option value="PENDING">Pending</option>
                                     <option value="IN_PROGRESS">In Progress</option>
                                     <option value="COMPLETED">Completed</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="priority-filter">
+                                    Filter by priority
+                                </label>
+
+                                <select
+                                    id="priority-filter"
+                                    value={selectedPriority}
+                                    onChange={event =>
+                                        setSelectedPriority(
+                                            event.target.value as Task["priority"] | "ALL"
+                                        )
+                                    }
+                                >
+                                    <option value="ALL">All</option>
+                                    <option value="LOW">Low</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="HIGH">High</option>
                                 </select>
                             </div>
 
