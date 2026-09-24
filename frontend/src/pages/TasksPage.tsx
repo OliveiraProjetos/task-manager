@@ -9,10 +9,15 @@ import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
 
 function TasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [selectedStatus, setSelectedStatus] = useState<Task["status"] | "ALL">("ALL");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const { token, logout } = useAuth();
+    const filteredTasks =
+        selectedStatus === "ALL"
+            ? tasks
+            : tasks.filter(task => task.status === selectedStatus);
 
     useEffect(() => {
 
@@ -136,11 +141,34 @@ function TasksPage() {
                             <p>Create your first task using the form above.</p>
                         </div>
                     ) : (
-                        <TaskList
-                            tasks={tasks}
-                            onUpdate={handleUpdateTask}
-                            onDelete={handleDeleteTask}
-                        />
+                        <>
+                            <div className="form-group">
+                                <label htmlFor="status-filter">
+                                    Filter by status
+                                </label>
+
+                                <select
+                                    id="status-filter"
+                                    value={selectedStatus}
+                                    onChange={event =>
+                                        setSelectedStatus(
+                                            event.target.value as Task["status"] | "ALL"
+                                        )
+                                    }
+                                >
+                                    <option value="ALL">All</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="IN_PROGRESS">In Progress</option>
+                                    <option value="COMPLETED">Completed</option>
+                                </select>
+                            </div>
+
+                            <TaskList
+                                tasks={filteredTasks}
+                                onUpdate={handleUpdateTask}
+                                onDelete={handleDeleteTask}
+                            />
+                        </>
                     )}
                 </section>
             </main>
