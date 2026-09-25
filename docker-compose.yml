@@ -19,7 +19,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/taskmanager
       DB_USERNAME: taskmanager
       DB_PASSWORD: taskmanager123
-      JWT_SECRET: REMOVED_SECRET
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: 3600000
     ports:
       - "8080:8080"
