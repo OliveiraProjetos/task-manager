@@ -1,536 +1,260 @@
 # Task Manager
 
-Aplicação full-stack de gerenciamento de tarefas, desenvolvida com **Spring Boot** e **React**, com autenticação JWT, API REST, testes automatizados e infraestrutura para desenvolvimento local com Docker.
+![CI](https://github.com/OliveiraProjetos/task-manager/actions/workflows/ci.yml/badge.svg)
 
-## Sobre o projeto
-
-O Task Manager é uma aplicação para gerenciamento de tarefas por usuários.
-
-O projeto foi desenvolvido com foco em estudo e prática de desenvolvimento full-stack, aplicando conceitos e tecnologias comuns em projetos Java modernos, como:
-
-- API REST com Spring Boot;
-- persistência de dados com JPA/Hibernate;
-- PostgreSQL;
-- autenticação e autorização com Spring Security e JWT;
-- migrations de banco de dados com Flyway;
-- validação de dados;
-- testes automatizados;
-- documentação de API com OpenAPI/Swagger;
-- frontend em React com TypeScript;
-- execução local com Docker e Docker Compose.
-
-A aplicação possui dois principais contextos de negócio: **usuários** e **tarefas**. Cada tarefa pertence a um usuário autenticado.
+Aplicação full-stack de gerenciamento de tarefas desenvolvida com **Java, Spring Boot, React e TypeScript**. O projeto reúne uma API REST com autenticação JWT, persistência em PostgreSQL, testes automatizados e ambiente de desenvolvimento com Docker Compose.
 
 ## Funcionalidades
 
-### Autenticação
-
-- Cadastro de usuário;
-- Login com geração de token JWT;
-- Senhas armazenadas utilizando BCrypt;
-- Proteção das rotas de tarefas;
-- Autenticação stateless;
-- Tratamento de acesso não autorizado.
-
-### Gerenciamento de tarefas
-
-Usuários autenticados podem:
-
-- criar tarefas;
-- listar suas tarefas;
-- consultar uma tarefa específica;
-- atualizar tarefas;
-- excluir tarefas;
-- definir status;
-- definir prioridade;
-- informar descrição;
-- informar data de vencimento.
-
-No frontend, as tarefas podem ser filtradas por:
-
-- status;
-- prioridade.
-
-### Frontend
-
-- Página de login;
-- página de cadastro;
-- rotas protegidas;
-- listagem de tarefas;
-- criação de tarefas;
-- edição de tarefas;
-- página de detalhes;
-- exclusão de tarefas;
-- estados de carregamento, erro e lista vazia;
-- tratamento de respostas não autorizadas.
+- Cadastro e login de usuários com autenticação JWT.
+- Senhas protegidas com BCrypt.
+- CRUD completo de tarefas.
+- Definição de título, descrição, status, prioridade e data de vencimento.
+- Filtros de tarefas por status e prioridade.
+- Rotas protegidas e tratamento de sessões não autenticadas.
+- Validação de dados e tratamento centralizado de exceções.
+- Documentação interativa da API com Swagger/OpenAPI.
+- Testes automatizados no backend e no frontend.
+- Pipeline de CI com GitHub Actions.
 
 ## Tecnologias
 
 ### Backend
-
-| Tecnologia | Uso |
-|---|---|
-| Java 21 | Linguagem |
-| Spring Boot 3.5.4 | Framework principal |
-| Spring Web | API REST |
-| Spring Data JPA | Persistência |
-| Hibernate | ORM |
-| PostgreSQL | Banco de dados |
-| Spring Security | Segurança e autenticação |
-| JJWT | Geração e validação de tokens JWT |
-| Bean Validation | Validação dos dados |
-| Flyway | Migrations do banco |
-| Springdoc OpenAPI | Documentação da API |
-| H2 | Banco em memória para testes |
-| JaCoCo | Relatório de cobertura de testes |
+- Java 21
+- Spring Boot 3.5.4
+- Spring Web
+- Spring Data JPA e Hibernate
+- Spring Security e JWT (JJWT)
+- Bean Validation
+- PostgreSQL 16
+- Flyway
+- Springdoc OpenAPI / Swagger
+- JUnit, Spring Boot Test, Spring Security Test e H2
+- JaCoCo
 
 ### Frontend
+- React 19
+- TypeScript
+- Vite
+- React Router
+- React Hook Form e Zod
+- Vitest e Testing Library
+- ESLint
 
-| Tecnologia | Uso |
-|---|---|
-| React 19 | Interface |
-| TypeScript | Tipagem |
-| Vite | Build e desenvolvimento |
-| React Router | Roteamento |
-| React Hook Form | Gerenciamento de formulários |
-| Zod | Validação |
-| Vitest | Testes |
-| Testing Library | Testes de componentes |
-| ESLint | Análise estática |
-
-### Infraestrutura
-
-- Docker;
-- Docker Compose;
-- PostgreSQL 16.
+### Infraestrutura e qualidade
+- Docker e Docker Compose
+- GitHub Actions
 
 ## Arquitetura
 
-O projeto é dividido em backend e frontend:
-
-```text
-task-manager/
-├── src/                 # Backend Spring Boot
-├── frontend/            # Frontend React
-├── Dockerfile
-├── docker-compose.yml
-├── pom.xml
-└── .gitignore
-```
-
-### Backend
-
-```text
-src/main/java/io/github/oliveiraprojetos/taskmanager/
-├── config/
-├── controller/
-├── dto/
-├── enums/
-├── exception/
-├── model/
-├── repository/
-├── security/
-├── service/
-└── TaskManagerApplication.java
-```
-
-A aplicação segue uma separação por responsabilidades:
-
-- `controller`: endpoints HTTP;
-- `service`: regras de negócio;
-- `repository`: acesso aos dados;
-- `model`: entidades persistidas;
-- `dto`: objetos utilizados na entrada e saída da API;
-- `security`: autenticação e filtro JWT;
-- `exception`: exceções e tratamento global;
-- `config`: configurações da aplicação;
-- `enums`: valores enumerados utilizados pelo domínio.
-
-### Frontend
-
-```text
-frontend/
-├── src/
-│   ├── components/
-│   ├── contexts/
-│   ├── pages/
-│   ├── schemas/
-│   ├── services/
-│   ├── test/
-│   ├── types/
-│   ├── utils/
-│   ├── App.tsx
-│   ├── App.css
-│   ├── index.css
-│   └── main.tsx
-├── public/
-├── package.json
-└── ...
-```
-
-## Segurança
-
-A API utiliza **Spring Security** com autenticação baseada em JWT.
-
-O fluxo principal é:
-
-```text
-Login
-  │
-  ▼
-POST /auth/login
-  │
-  ▼
-JWT
-  │
-  ▼
-Frontend envia:
-Authorization: Bearer <token>
-  │
-  ▼
-JwtAuthenticationFilter
-  │
-  ▼
-Acesso às rotas protegidas
-```
-
-As rotas de autenticação são públicas:
-
-```text
-POST /auth/register
-POST /auth/login
-```
-
-As operações de tarefas exigem autenticação.
-
-Além disso, as operações de tarefas são associadas ao usuário autenticado. A aplicação busca as tarefas utilizando o identificador do usuário, evitando que um usuário acesse diretamente tarefas pertencentes a outro usuário.
-
-## API
-
-### Autenticação
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/auth/register` | Cadastra um usuário |
-| POST | `/auth/login` | Realiza login e retorna um JWT |
-
-### Tarefas
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/tasks` | Lista as tarefas do usuário autenticado |
-| POST | `/tasks` | Cria uma tarefa |
-| GET | `/tasks/{id}` | Consulta uma tarefa |
-| PUT | `/tasks/{id}` | Atualiza uma tarefa |
-| DELETE | `/tasks/{id}` | Exclui uma tarefa |
-
-Os endpoints de tarefas utilizam autenticação Bearer com JWT.
-
-## Documentação da API
-
-A API possui documentação utilizando **OpenAPI/Swagger**.
-
-Com o backend executando localmente, os principais endpoints de documentação são:
-
-```text
-http://localhost:8080/swagger-ui.html
-http://localhost:8080/swagger-ui/
-http://localhost:8080/v3/api-docs
-```
-
-A documentação também possui configuração de autenticação Bearer para utilização do JWT nas rotas protegidas.
-
-## Banco de dados
-
-O projeto utiliza **PostgreSQL** no ambiente principal.
-
-O schema inicial é criado através do Flyway:
-
-```text
-src/main/resources/db/migration/
-└── V1__create_initial_schema.sql
-```
-
-A estrutura atual possui as tabelas:
-
-```text
-users
-  │
-  │ 1:N
-  ▼
-tasks
-```
-
-Cada tarefa possui uma referência ao usuário através de `user_id`.
-
-### Principais campos
-
-**users**
-
-- `id`
-- `username`
-- `password`
-
-**tasks**
-
-- `id`
-- `status`
-- `priority`
-- `title`
-- `description`
-- `due_date`
-- `created_at`
-- `updated_at`
-- `user_id`
-
-No ambiente de testes, o projeto utiliza **H2 em memória** com `create-drop`, permitindo executar os testes sem depender de um banco PostgreSQL externo.
-
-## Testes
-
-O projeto possui testes automatizados para diferentes camadas do backend e frontend.
-
-### Backend
-
-Existem testes para:
-
-- configurações;
-- controllers;
-- DTOs;
-- exceções;
-- entidades;
-- repositories;
-- segurança;
-- services.
-
-Os testes do backend utilizam **JUnit/Spring Boot Test**, **Spring Security Test** e **H2**.
-
-### Frontend
-
-Existem testes para:
-
-- componentes;
-- páginas;
-- rotas protegidas;
-- formulários;
-- listagem e edição de tarefas.
-
-O frontend utiliza **Vitest** e **Testing Library**.
-
-### Cobertura
-
-O backend possui configuração do **JaCoCo** para geração de relatório de cobertura durante a execução dos testes.
-
-## Como executar
-
-### Pré-requisitos
-
-Para executar o projeto localmente, tenha instalado:
-
-- Java 21;
-- Maven;
-- Node.js e npm;
-- Docker e Docker Compose, caso queira utilizar a infraestrutura Docker.
-
-### 1. Backend
-
-O backend utiliza variáveis de ambiente para configuração do banco de dados e do JWT.
-
-Exemplo para execução local:
-
-```bash
-export DB_URL=jdbc:postgresql://localhost:5432/taskmanager
-export DB_USERNAME=taskmanager
-export DB_PASSWORD=taskmanager123
-export JWT_SECRET=<sua-chave-secreta>
-export JWT_EXPIRATION=3600000
-```
-
-Depois, execute:
-
-```bash
-mvn spring-boot:run
-```
-
-A API ficará disponível em:
-
-```text
-http://localhost:8080
-```
-
-### 2. Frontend
-
-Entre no diretório do frontend:
-
-```bash
-cd frontend
-```
-
-Instale as dependências:
-
-```bash
-npm install
-```
-
-O projeto utiliza a variável:
-
-```env
-VITE_API_URL=http://localhost:8080
-```
-
-Ela está configurada no arquivo local `frontend/.env`.
-
-Para iniciar o frontend:
-
-```bash
-npm run dev
-```
-
-O Vite disponibilizará a aplicação no endereço padrão de desenvolvimento:
-
-```text
-http://localhost:5173
-```
-
-### 3. Testes do frontend
-
-Para executar os testes:
-
-```bash
-npm test
-```
-
-Para executar uma vez sem o modo interativo:
-
-```bash
-npm run test:run
-```
-
-Para verificar o lint:
-
-```bash
-npm run lint
-```
-
-Para gerar o build:
-
-```bash
-npm run build
-```
-
-## Executando com Docker
-
-O projeto possui Docker Compose para facilitar a execução local do PostgreSQL e da aplicação.
-
-O `docker-compose.yml` define:
-
-- PostgreSQL 16;
-- banco `taskmanager`;
-- usuário `taskmanager`;
-- volume persistente para os dados;
-- aplicação na porta `8080`.
-
-O `Dockerfile` utiliza uma imagem Java 21 JRE e copia o JAR previamente gerado para dentro da imagem.
-
-Por isso, primeiro gere o JAR:
-
-```bash
-mvn clean package
-```
-
-Depois, execute:
-
-```bash
-docker compose up --build
-```
-
-A aplicação ficará disponível em:
-
-```text
-http://localhost:8080
-```
-
-O frontend continua sendo executado separadamente durante o desenvolvimento:
-
-```bash
-cd frontend
-npm run dev
-```
-
-### Observação sobre o ambiente Docker
-
-Dentro do Docker Compose, a aplicação utiliza o nome do serviço PostgreSQL como host:
-
-```text
-jdbc:postgresql://postgres:5432/taskmanager
-```
-
-Isso é diferente da configuração utilizada quando o backend é executado diretamente na máquina local.
-
-As credenciais presentes no `docker-compose.yml` fazem parte da configuração de desenvolvimento local deste projeto.
-
-## Estrutura do projeto
+O repositório contém o backend Spring Boot na raiz e o frontend React no diretório `frontend/`.
 
 ```text
 task-manager/
 ├── src/
 │   ├── main/
-│   │   ├── java/
-│   │   └── resources/
+│   │   ├── java/io/github/oliveiraprojetos/taskmanager/
+│   │   │   ├── config/
+│   │   │   ├── controller/
+│   │   │   ├── dto/
+│   │   │   ├── enums/
+│   │   │   ├── exception/
+│   │   │   ├── model/
+│   │   │   ├── repository/
+│   │   │   ├── security/
+│   │   │   └── service/
+│   │   └── resources/db/migration/
 │   └── test/
-│
 ├── frontend/
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── ...
-│
-├── docker-compose.yml
+│   └── src/
+│       ├── components/
+│       ├── contexts/
+│       ├── pages/
+│       ├── schemas/
+│       ├── services/
+│       ├── test/
+│       ├── types/
+│       └── utils/
+├── .github/workflows/ci.yml
 ├── Dockerfile
+├── docker-compose.yml
 ├── pom.xml
-├── .gitignore
 └── README.md
 ```
 
-Arquivos e diretórios específicos do ambiente local, como `.git/`, `.idea/` e `target/`, não fazem parte da estrutura versionada apresentada acima.
+O backend separa responsabilidades entre controllers, services e repositories. DTOs definem os dados de entrada e saída da API, enquanto Spring Security e o filtro JWT protegem os endpoints privados.
 
-## Qualidade e boas práticas
+Cada tarefa está associada ao usuário que a criou. As consultas e operações de tarefas consideram o usuário autenticado, evitando acesso direto às tarefas de outras contas.
 
-Durante o desenvolvimento foram aplicadas práticas como:
+## API REST
 
-- separação de responsabilidades entre camadas;
-- utilização de DTOs para entrada e saída da API;
-- tratamento global de exceções;
-- validação de dados;
-- autenticação stateless com JWT;
-- proteção de recursos por usuário;
-- migrations versionadas com Flyway;
-- testes automatizados no backend e frontend;
-- testes de componentes e páginas React;
-- análise estática com ESLint;
-- relatório de cobertura com JaCoCo;
-- documentação da API com OpenAPI/Swagger;
-- configuração da aplicação por variáveis de ambiente.
+### Autenticação
 
-## Próximos passos
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/auth/register` | Cadastra um usuário |
+| `POST` | `/auth/login` | Autentica e retorna um JWT |
 
-O projeto continuará evoluindo com foco em:
+### Tarefas
 
-- criação de pipeline de CI com GitHub Actions;
-- deploy da aplicação;
-- refinamentos de código e arquitetura;
-- melhorias de infraestrutura e configuração;
-- evolução contínua do projeto para portfólio.
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/tasks` | Lista as tarefas do usuário autenticado |
+| `POST` | `/tasks` | Cria uma tarefa |
+| `GET` | `/tasks/{id}` | Consulta uma tarefa |
+| `PUT` | `/tasks/{id}` | Atualiza uma tarefa |
+| `DELETE` | `/tasks/{id}` | Exclui uma tarefa |
 
-## Status do projeto
+As rotas de tarefas exigem um token JWT no cabeçalho:
 
-**Em desenvolvimento.**
+```http
+Authorization: Bearer <token>
+```
 
-A aplicação já possui backend, frontend, autenticação, gerenciamento de tarefas, testes automatizados, documentação da API e configuração para execução local com Docker.
+### Swagger / OpenAPI
 
-As próximas etapas planejadas são a preparação final para publicação no GitHub, criação do CI e posteriormente o deploy.
+Com o backend em execução, acesse:
+
+- Swagger UI: <http://localhost:8080/swagger-ui/index.html>
+- Especificação OpenAPI: <http://localhost:8080/v3/api-docs>
+
+O Swagger permite explorar os endpoints e testar as operações autenticadas usando o token JWT.
+
+## Como executar localmente
+
+### Pré-requisitos
+
+- Java 21
+- Maven
+- Node.js e npm
+- Docker com Docker Compose
+
+### 1. Configurar variáveis de ambiente
+
+Na raiz do repositório, crie um arquivo `.env` para o Docker Compose:
+
+```env
+JWT_SECRET=coloque_aqui_uma_chave_secreta_forte
+```
+
+Use uma chave longa e aleatória. Não compartilhe esse valor e não o versione no Git.
+
+### 2. Iniciar backend e PostgreSQL com Docker
+
+Gere o JAR do backend:
+
+```bash
+./mvnw clean package
+```
+
+Se o repositório não tiver o Maven Wrapper, use:
+
+```bash
+mvn clean package
+```
+
+Inicie os serviços:
+
+```bash
+docker compose up --build
+```
+
+A API ficará disponível em <http://localhost:8080>. O Docker Compose inicia o PostgreSQL e a aplicação; o Flyway gerencia as migrations do banco.
+
+Para encerrar os serviços:
+
+```bash
+docker compose down
+```
+
+Os dados do PostgreSQL são mantidos no volume configurado pelo Compose. Para removê-los também, use `docker compose down -v` — isso apaga os dados locais do banco.
+
+### 3. Iniciar o frontend
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm ci
+```
+
+Crie `frontend/.env` com:
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+Inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+O frontend ficará disponível em <http://localhost:5173>.
+
+> **Observação:** o arquivo `frontend/.env` e o `.env` da raiz contêm configurações locais e não devem ser enviados ao Git. Não use as credenciais de desenvolvimento em um ambiente público.
+
+## Testes e qualidade
+
+### Backend
+
+Executar testes e verificações Maven:
+
+```bash
+./mvnw --batch-mode --no-transfer-progress clean verify
+```
+
+Ou, se não houver Maven Wrapper:
+
+```bash
+mvn --batch-mode --no-transfer-progress clean verify
+```
+
+Os testes usam H2 em memória para evitar a dependência de um PostgreSQL externo durante a execução.
+
+O JaCoCo está configurado para gerar relatório de cobertura durante a verificação Maven.
+
+### Frontend
+
+Dentro do diretório `frontend/`:
+
+```bash
+npm ci
+npm run test:run
+npm run lint
+npm run build
+```
+
+- `test:run`: executa os testes sem modo interativo.
+- `lint`: verifica padrões e possíveis problemas no código.
+- `build`: verifica os tipos TypeScript e gera a versão de produção.
+
+### Integração contínua
+
+O GitHub Actions executa automaticamente as verificações do backend e do frontend em pushes para `main` e em pull requests direcionados a `main`.
+
+O status da pipeline aparece no badge no início deste README e na aba **Actions** do repositório.
+
+## Banco de dados
+
+O banco principal é PostgreSQL. As migrations versionadas ficam em:
+
+```text
+src/main/resources/db/migration/
+```
+
+O modelo atual inclui usuários (`users`) e tarefas (`tasks`), com relacionamento de um usuário para várias tarefas por meio de `tasks.user_id`.
+
+No ambiente de testes, o projeto usa H2 em memória.
+
+## Status
+
+**Backend, frontend, testes automatizados, Docker e CI implementados.**
+
+O deploy ainda não foi realizado; a aplicação é executada localmente seguindo as instruções acima.
 
 ## Autor
 
 **Gabriel Oliveira**
 
-Projeto desenvolvido para estudo e construção de portfólio em desenvolvimento Java e full-stack.
+Projeto desenvolvido para praticar Java, Spring Boot e desenvolvimento full-stack, com foco em organização de código, segurança, testes automatizados e fluxo de desenvolvimento profissional.
