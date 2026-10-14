@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import type { Task, UpdateTaskRequest } from "../types/Task";
 import TaskEditForm from "./TaskEditForm";
 import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
-import {useAuth} from "../contexts/AuthContext.tsx";
+import { useAuth } from "../contexts/useAuth";
 
 type TaskCardProps = {
     task: Task;

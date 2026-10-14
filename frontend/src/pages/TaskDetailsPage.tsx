@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 
 import Header from "../components/Header";
 import TaskEditForm from "../components/TaskEditForm";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/useAuth";
 import { getTask, updateTask } from "../services/taskService";
 import { isUnauthorizedError } from "../utils/apiError";
 import type { Task, UpdateTaskRequest } from "../types/Task";
@@ -52,7 +52,7 @@ function TaskDetailsPage() {
         }
 
         void loadTask();
-    }, [id, token]);
+    }, [id, token, logout]);
 
     async function handleUpdateTask(data: UpdateTaskRequest) {
         if (!task) {

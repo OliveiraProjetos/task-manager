@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/useAuth";
 import type { Task } from "../types/Task";
 import { createTask } from "../services/taskService";
 import {taskSchema, type TaskFormData,} from "../schemas/taskSchema";

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/useAuth";
 import {deleteTask, getTasks, updateTask } from "../services/taskService";
 import type { Task, UpdateTaskRequest } from "../types/Task";
 import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
@@ -47,7 +47,7 @@ function TasksPage() {
         }
 
         void loadTasks();
-    }, [token]);
+    }, [token, logout]);
 
     function handleTaskCreated(task: Task) {
         setTasks(currentTasks => [...currentTasks, task]);
