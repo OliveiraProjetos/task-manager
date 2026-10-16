@@ -42,6 +42,14 @@ describe("TaskEditForm", () => {
             "Existing description"
         );
 
+        expect(screen.getByLabelText("Status")).toHaveValue(
+            "IN_PROGRESS"
+        );
+
+        expect(screen.getByLabelText("Priority")).toHaveValue(
+            "HIGH"
+        );
+
         expect(screen.getByLabelText("Due date")).toHaveValue(
             "2026-09-30"
         );
@@ -80,9 +88,8 @@ describe("TaskEditForm", () => {
         ).toBeInTheDocument();
     });
 
-    it("calls onSave with the edited data", async () => {
+    it("calls onSave with the edited data, including status and priority", async () => {
         const user = userEvent.setup();
-
         const onSave = vi.fn().mockResolvedValue(undefined);
 
         renderTaskEditForm(onSave);
@@ -97,6 +104,16 @@ describe("TaskEditForm", () => {
         await user.type(
             screen.getByLabelText("Description"),
             "Updated description"
+        );
+
+        await user.selectOptions(
+            screen.getByLabelText("Status"),
+            "COMPLETED"
+        );
+
+        await user.selectOptions(
+            screen.getByLabelText("Priority"),
+            "MEDIUM"
         );
 
         fireEvent.change(screen.getByLabelText("Due date"), {
@@ -115,6 +132,8 @@ describe("TaskEditForm", () => {
             expect(onSave).toHaveBeenCalledWith({
                 title: "Updated task",
                 description: "Updated description",
+                status: "COMPLETED",
+                priority: "MEDIUM",
                 dueDate: "2026-10-15",
             });
         });
@@ -122,7 +141,6 @@ describe("TaskEditForm", () => {
 
     it("calls onCancel when cancel is clicked", async () => {
         const user = userEvent.setup();
-
         const onCancel = vi.fn();
 
         renderTaskEditForm(

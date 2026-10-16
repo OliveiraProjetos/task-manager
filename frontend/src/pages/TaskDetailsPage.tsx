@@ -116,11 +116,7 @@ function TaskDetailsPage() {
                                 <TaskEditForm
                                     task={task}
                                     onSave={async (data) => {
-                                        await handleUpdateTask({
-                                            ...data,
-                                            status: task.status,
-                                            priority: task.priority,
-                                        });
+                                        await handleUpdateTask(data);
                                     }}
                                     onCancel={handleCancelEdit}
                                 />

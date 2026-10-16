@@ -105,7 +105,7 @@ describe("TaskDetailsPage", () => {
         });
     });
 
-    it("enters edit mode and saves the updated task", async () => {
+    it("enters edit mode and saves the updated task, status, and priority", async () => {
         const user = userEvent.setup();
 
         vi.mocked(getTask).mockResolvedValue(task);
@@ -114,6 +114,8 @@ describe("TaskDetailsPage", () => {
             ...task,
             title: "Updated task",
             description: "Updated description",
+            status: "COMPLETED",
+            priority: "MEDIUM",
             dueDate: "2026-10-15",
         };
 
@@ -145,21 +147,27 @@ describe("TaskDetailsPage", () => {
             "Updated task"
         );
 
-        await user.clear(
-            screen.getByLabelText("Description")
-        );
+        await user.clear(screen.getByLabelText("Description"));
         await user.type(
             screen.getByLabelText("Description"),
             "Updated description"
         );
 
-        const dueDate = screen.getByLabelText("Due date");
+        await user.selectOptions(
+            screen.getByLabelText("Status"),
+            "COMPLETED"
+        );
 
-        await waitFor(() => {
-            expect(dueDate).toHaveValue("2026-09-30");
-        });
+        await user.selectOptions(
+            screen.getByLabelText("Priority"),
+            "MEDIUM"
+        );
 
-        dueDate.focus();
+        await user.clear(screen.getByLabelText("Due date"));
+        await user.type(
+            screen.getByLabelText("Due date"),
+            "2026-10-15"
+        );
 
         await user.click(
             screen.getByRole("button", {
@@ -173,18 +181,26 @@ describe("TaskDetailsPage", () => {
                 {
                     title: "Updated task",
                     description: "Updated description",
-                    dueDate: "2026-09-30",
-                    status: "IN_PROGRESS",
-                    priority: "HIGH",
+                    dueDate: "2026-10-15",
+                    status: "COMPLETED",
+                    priority: "MEDIUM",
                 },
                 "test-token"
             );
         });
 
         expect(
-            screen.getByRole("heading", {
+            await screen.findByRole("heading", {
                 name: "Updated task",
             })
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText("Status: COMPLETED")
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText("Priority: MEDIUM")
         ).toBeInTheDocument();
     });
 

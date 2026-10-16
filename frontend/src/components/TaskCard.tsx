@@ -62,13 +62,9 @@ function TaskCard({task, onUpdate, onDelete,}: TaskCardProps) {
             <article className="task-card">
                 <TaskEditForm
                     task={task}
-                    onSave={async (data) => {
-                        await onUpdate(task.id, {
-                            ...data,
-                            status: task.status,
-                            priority: task.priority,
-                        });
 
+                    onSave={async (data) => {
+                        await onUpdate(task.id, data);
                         setEditing(false);
                     }}
                     onCancel={handleCancel}

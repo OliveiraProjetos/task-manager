@@ -18,4 +18,10 @@ export const taskSchema = z.object({
         .min(1, "Due date is required"),
 });
 
+export const taskEditSchema = taskSchema.extend({
+    status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED"]),
+    priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+});
+
 export type TaskFormData = z.infer<typeof taskSchema>;
+export type TaskEditFormData = z.infer<typeof taskEditSchema>;

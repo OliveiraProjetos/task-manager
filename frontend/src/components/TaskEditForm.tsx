@@ -3,13 +3,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useAuth } from "../contexts/useAuth";
-import {taskSchema, type TaskFormData,} from "../schemas/taskSchema";
+import {taskEditSchema, type TaskEditFormData,} from "../schemas/taskSchema";
 import type { Task } from "../types/Task"
 import { getUserErrorMessage, isUnauthorizedError } from "../utils/apiError";
 
 type TaskEditFormProps = {
     task: Task;
-    onSave: (data: TaskFormData) => Promise<void>;
+    onSave: (data: TaskEditFormData) => Promise<void>;
     onCancel: () => void;
 };
 
@@ -24,16 +24,18 @@ function TaskEditForm({task, onSave, onCancel,}: TaskEditFormProps) {
             errors,
             isSubmitting,
         },
-    } = useForm<TaskFormData>({
-        resolver: zodResolver(taskSchema),
+    } = useForm<TaskEditFormData>({
+        resolver: zodResolver(taskEditSchema),
         defaultValues: {
             title: task.title,
             description: task.description,
+            status: task.status,
+            priority: task.priority,
             dueDate: task.dueDate,
         },
     });
 
-    async function handleSave(data: TaskFormData) {
+    async function handleSave(data: TaskEditFormData) {
         setError(null);
 
         try {
@@ -86,6 +88,50 @@ function TaskEditForm({task, onSave, onCancel,}: TaskEditFormProps) {
                 {errors.description && (
                     <p className="form-error">
                         {errors.description.message}
+                    </p>
+                )}
+            </div>
+
+            <div className="form-group">
+                <label htmlFor={`status-${task.id}`}>
+                    Status
+                </label>
+
+                <select
+                    id={`status-${task.id}`}
+                    {...register("status")}
+                    disabled={isSubmitting}
+                >
+                    <option value="PENDING">Pending</option>
+                    <option value="IN_PROGRESS">In progress</option>
+                    <option value="COMPLETED">Completed</option>
+                </select>
+
+                {errors.status && (
+                    <p className="form-error">
+                        {errors.status.message}
+                    </p>
+                )}
+            </div>
+
+            <div className="form-group">
+                <label htmlFor={`priority-${task.id}`}>
+                    Priority
+                </label>
+
+                <select
+                    id={`priority-${task.id}`}
+                    {...register("priority")}
+                    disabled={isSubmitting}
+                >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+
+                {errors.priority && (
+                    <p className="form-error">
+                        {errors.priority.message}
                     </p>
                 )}
             </div>
